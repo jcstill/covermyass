@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 
 LOGS_FILES=(
-        /var/log/messages # General message and system related stuff
-        /var/log/auth.log # Authenication logs
-        /var/log/kern.log # Kernel logs
-        /var/log/cron.log # Crond logs
-        /var/log/maillog # Mail server logs
-        /var/log/boot.log # System boot log
-        /var/log/mysqld.log # MySQL database server log file
-        /var/log/qmail # Qmail log directory
-        /var/log/httpd # Apache access and error logs directory
-        /var/log/lighttpd # Lighttpd access and error logs directory
-        /var/log/secure # Authentication log
-        /var/log/utmp # Login records file
-        /var/log/wtmp # Login records file
-        /var/log/yum.log # Yum command log file
-        /var/log/system.log # System Log
-        /var/log/DiagnosticMessages # Mac Analytics Data
-        /Library/Logs # System Application Logs
-        /Library/Logs/DiagnosticReports # System Reports
-        ~/Library/Logs # User Application Logs
-        ~/Library/Logs/DiagnosticReports # User Reports
-        /var/log/lastlog
+        /var/log/messages* # General message and system related stuff
+        /var/log/auth.log* # Authenication logs
+        /var/log/kern.log* # Kernel logs
+        /var/log/cron.log* # Crond logs
+        /var/log/maillog* # Mail server logs
+        /var/log/boot.log* # System boot log
+        /var/log/mysqld.log* # MySQL database server log file
+        /var/log/qmail* # Qmail log directory
+        /var/log/httpd* # Apache access and error logs directory
+        /var/log/lighttpd* # Lighttpd access and error logs directory
+        /var/log/secure* # Authentication log
+        /var/log/utmp* # Login records file
+        /var/log/wtmp* # Login records file
+        /var/log/yum.log* # Yum command log file
+        /var/log/system.log* # System Log
+        /var/log/DiagnosticMessages* # Mac Analytics Data
+        /Library/Logs* # System Application Logs
+        /Library/Logs/DiagnosticReports* # System Reports
+        ~/Library/Logs* # User Application Logs
+        ~/Library/Logs/DiagnosticReports* # User Reports
+        /var/log/lastlog*
 )
 
 function isRoot () {
@@ -153,13 +153,54 @@ function exitTool () {
         exit 1
 }
 
-clear # Clear output
+#clear # Clear output
 
 # "now" option
 if [ -n "$1" ] && [ "$1" == 'now' ]; then
         clearLogs
         clearHistory
         exit 0
+elif [ -n "$1" ] && [ -n "$2" ] && [ "$1" == 'cleanup' ]; then
+#usage: sudo covermyass cleanup <USERNAME>
+	echo
+	echo "[+] Starting cleanup..."
+	if [ -f /root/crontab.bak ]; then
+		echo "[+] Removing old backup"
+		rm -rf /root/crontab.bak
+	fi
+	echo "[+] Creating new backup of crontab"
+	crontab -l > /root/crontab.bak
+	cp /root/crontab.bak /root/crontab.new
+	echo "[+] Injecting modified crontab"
+	MINUTE="$(date +'%M' -d '+1 minute')"
+	echo "$MINUTE * * * * covermyass aisjfbfu $2" >> /root/crontab.new
+	crontab /root/crontab.new
+	rm /root/crontab.new
+	TIME="$(date +'%H:%M %Z %z' -d '+1 minute')"
+	echo "[+] Crontab job crated. Executing at $TIME localhost time"
+	exit 0
+elif [ -n "$1" ] && [ -n "$2" ] && [ "$1" == 'aisjfbfu' ]; then
+#Dont call from commandline. Used in crontab job!
+	crontab /root/crontab.bak
+	rm /root/crontab.bak
+	clearLogs
+
+	ROOTHOME="$(su root -c "covermyass now")"
+	if [ -f $ROOTHOME/.zsh_history ]; then
+		echo "" > $ROOTHOME/.zsh_history
+	fi
+	echo "" > $ROOTHOME/.bash_history
+
+	USERHOME="$(su $2 -c "echo $HOME")"
+	if [ -f $USERHOME/.zsh_history ]; then
+		echo "" > $USERHOME/.zsh_history
+	fi
+	echo "" > $USERHOME/.bash_history
+
+#	Dont want to accidentally delete durring testing haha
+#	rm -rf "$0"
+
+	exit 0
 fi
 
 menu
