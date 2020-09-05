@@ -22,6 +22,7 @@ LOGS_FILES=(
         ~/Library/Logs* # User Application Logs
         ~/Library/Logs/DiagnosticReports* # User Reports
         /var/log/lastlog*
+	/run/log/journal/*
 )
 
 function isRoot () {
