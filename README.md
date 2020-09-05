@@ -38,14 +38,14 @@ This tool allows you to clear log files such as :
 With sudo
 
 ```bash
-sudo curl -sSL https://raw.githubusercontent.com/sundowndev/covermyass/master/covermyass -o /usr/bin/covermyass
+sudo curl -sSL https://raw.githubusercontent.com/jcstill/covermyass/master/covermyass -o /usr/bin/covermyass
 sudo chmod +x /usr/bin/covermyass
 ```
 
 Without sudo :
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/sundowndev/covermyass/master/covermyass -o ~/.local/bin/covermyass
+curl -sSL https://raw.githubusercontent.com/jcstill/covermyass/master/covermyass -o ~/.local/bin/covermyass
 chmod +x ~/.local/bin/covermyass
 ```
 
